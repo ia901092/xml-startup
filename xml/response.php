@@ -108,6 +108,17 @@ function parseVehicle($vehicle) {
         a.back-link:hover {
             text-decoration: underline;
         }
+        a.home-link {
+            display: inline-block;
+            margin-left: 20px;
+            color: #1a3a5c;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        a.home-link:hover {
+            text-decoration: underline;
+        }
         .info-box {
             background: #ffffff;
             padding: 20px 24px;
@@ -199,7 +210,8 @@ function parseVehicle($vehicle) {
 <div class="container">
 
     <h1>Fordonsresultat</h1>
-    <a class="back-link" href="form.php">&larr; Tillbaka</a>
+    <a class="back-link" href="form.php">&larr; Tillbaka till val</a>
+    <a class="home-link" href="index.html">Startsida</a>
 
     <?php if ($selectedCountry === ''): ?>
 

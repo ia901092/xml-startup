@@ -68,10 +68,22 @@ $arr      = json_decode($jsontext, true);
         input[type="submit"]:hover {
             background-color: #122b44;
         }
+        a.home-link {
+            display: block;
+            margin-bottom: 20px;
+            color: #1a3a5c;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        a.home-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="card">
+        <a class="home-link" href="index.html">&larr; Till startsidan</a>
         <h1>Välj fordonstillverkare</h1>
         <form action="response.php" method="get">
             <label for="country">Tillverkare:</label>
