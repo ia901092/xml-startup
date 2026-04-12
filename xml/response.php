@@ -1,5 +1,5 @@
 <?php
-// response.php 
+// response.php
 $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
 $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
@@ -8,7 +8,7 @@ $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
 $manufacturerJson = file_get_contents($MANUFACTURER_URL);
 $manufacturers    = json_decode($manufacturerJson, true);
 
-//  valt land från GET
+// Läs valt land från GET
 $selectedCountry = isset($_GET['country']) ? trim($_GET['country']) : '';
 
 // Hämta fordon om ett land är valt
@@ -26,7 +26,6 @@ if ($selectedCountry !== '') {
 }
 
 // Listar ut vilket fält som är vilket (bild, HP, år).
-
 function parseVehicle($vehicle) {
     $count = count($vehicle);
 
@@ -52,13 +51,10 @@ function parseVehicle($vehicle) {
         }
 
         if (preg_match('/^\d+\s*[Hh][Pp]$/', $val)) {
-            // HP-värde: t.ex. "330Hp", "265HP"
             $hp = $val;
         } elseif (preg_match('/\d{4}/', $val)) {
-            // Produktionsperiod: t.ex. "1997-2022", "1967-1982"
             $year = $val;
         } elseif ($val !== $model) {
-            // Övriga fält: drivlina, fordonstyp, etc.
             $extras[] = $val;
         }
     }
@@ -79,7 +75,7 @@ function parseVehicle($vehicle) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fordonsresultat</title>
     <style>
-        /* === Grundlayout === */
+        /* Grundlayout */
         body {
             font-family: Arial, sans-serif;
             background-color: #eef2f7;
@@ -119,7 +115,7 @@ function parseVehicle($vehicle) {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        /* === Yttre tabell === */
+        /* Yttre tabell */
         table.mfr-table {
             width: 100%;
             border-collapse: collapse;
@@ -140,7 +136,7 @@ function parseVehicle($vehicle) {
             vertical-align: top;
             font-size: 14px;
         }
-        /* Alternerande rader — yttre tabell */
+        /* Alternerande rader */
         table.mfr-table > tbody > tr:nth-child(even) {
             background-color: #f3f6fa;
         }
@@ -148,7 +144,7 @@ function parseVehicle($vehicle) {
             background-color: #ffffff;
         }
 
-        /* === Nästlad fordonstabll — Row Layout  
+        /* Nästlad fordonstabel */
         table.vehicle-table {
             width: 100%;
             border-collapse: collapse;
@@ -170,7 +166,7 @@ function parseVehicle($vehicle) {
         table.vehicle-table > tbody > tr:last-child > td {
             border-bottom: none;
         }
-        /* Alterntivrvt rader — fordonstabll (udda/jämt) */
+        /* Alternerande rader i fordonstabellen */
         table.vehicle-table > tbody > tr:nth-child(even) {
             background-color: #eaf0f8;
         }
@@ -178,7 +174,7 @@ function parseVehicle($vehicle) {
             background-color: #f9fbfd;
         }
 
-        /* === Villkorsstyling: HP > 300 = röd text, annars svart === */
+        /* HP över 300 = röd text */
         .high-hp {
             color: red;
             font-weight: bold;
@@ -187,22 +183,7 @@ function parseVehicle($vehicle) {
             color: black;
         }
 
-        /* === Fordonsbilder === */
-        img.vehicle-img {
-            width: 100px;
-            height: auto;
-            display: block;
-            border-radius: 4px;
-        }
-.high-hp {
-            color: red;
-            font-weight: bold;
-        }
-        .normal-hp {
-            color: black;
-        }
-
-        /* === Fordonsbilder === */
+        /* Fordonsbilder */
         img.vehicle-img {
             width: 100px;
             height: auto;
@@ -216,3 +197,81 @@ function parseVehicle($vehicle) {
 
     <h1>Fordonsresultat</h1>
     <a class="back-link" href="form.php">&larr; Tillbaka</a>
+
+    <?php if ($selectedCountry === ''): ?>
+        <!-- Inget val gjordes -->
+        <div class="info-box">
+            Inget val gjordes. Gå tillbaka och välj en tillverkare.
+        </div>
+    <?php elseif (empty($vehicles)): ?>
+        <div class="info-box">
+            Inga fordon hittades för
+            <strong><?php echo htmlspecialchars($selectedCountry); ?></strong>.
+        </div>
+    <?php else: ?>
+        <table class="mfr-table">
+            <thead><tr>
+                <th>Tillverkare</th>
+                <th>Land</th>
+                <th>Fordon</th>
+            </tr></thead>
+            <tbody>
+                <?php foreach ($vehicles as $v): ?>
+                    <?php
+                    $mfrName     = isset($v[0]) ? $v[0] : $selectedCountry;
+                    $mfrVehicles = isset($v[1]) ? $v[1] : [];
+                    ?>
+                    <tr>
+                        <td><strong><?php echo htmlspecialchars($mfrName); ?></strong></td>
+                        <td><?php echo htmlspecialchars($selectedCountry); ?></td>
+                        <td>
+                            <!-- Nästlad tabell med fordon -->
+                            <table class="vehicle-table">
+                                <thead><tr>
+                                    <th>Bild</th>
+                                    <th>Modell</th>
+                                    <th>Info</th>
+                                    <th>Effekt (HP)</th>
+                                    <th>År</th>
+                                </tr></thead>
+                                <tbody>
+                                    <?php foreach ($mfrVehicles as $vehicle): ?>
+                                        <?php
+                                        $f = parseVehicle($vehicle);
+                                        $hpNumeric = intval(substr($f['hp'], 0, -2));
+                                        if ($hpNumeric > 300) {
+                                            $hpClass = 'high-hp';
+                                        } else {
+                                            $hpClass = 'normal-hp';
+                                        }
+                                        ?>
+                                        <tr class="<?php echo $hpClass; ?>">
+                                            <td>
+                                                <?php if ($f['imgFile'] !== ''): ?>
+                                                    <img class="vehicle-img"
+                                                         src="<?php echo htmlspecialchars($IMAGE_BASE . $f['imgFile']); ?>"
+                                                         alt="<?php echo htmlspecialchars($f['model']); ?>">
+                                                <?php else: ?>
+                                                    <em style="color:#aaa;">Ingen bild</em>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($f['model']); ?></td>
+                                            <td><?php echo htmlspecialchars($f['info']); ?></td>
+                                            <td class="<?php echo $hpClass; ?>">
+                                                <?php echo htmlspecialchars($f['hp']); ?>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($f['year']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
+</div>
+</body>
+</html> 
