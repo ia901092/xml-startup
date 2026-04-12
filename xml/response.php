@@ -1,15 +1,4 @@
 <?php
-// response.php — Version B: Form/Response + Row Layout
-//
-// API datastruktur:
-//   $vehicles = [ [$tillverkarnamn, [$fordon1, $fordon2, ...]], ... ]
-//
-// Varje fordon är en array med varierande antal fält:
-//   - Index 0     : alltid modellnamnet
-//   - Sista index : alltid bildfilnamnet (slutar på .png)
-//   - "Hp"/"HP"   : HP-värdet (t.ex. "330Hp", "266Hp")
-//   - 4 siffror   : produktionsperiod (t.ex. "1997-2022")
-//   - Övriga      : drivlina, typ, etc.
 
 $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
@@ -36,12 +25,7 @@ if ($selectedCountry !== '') {
     }
 }
 
-// -----------------------------------------------------------
-// Hjälpfunktion: identifierar fält smart oavsett antal index.
-// Bildfilnamnet är ALLTID sista indexet (slutar på .png).
-// HP matchar: enbart siffror följt av "Hp" eller "HP".
-// År matchar: innehåller ett fyrasiffrigt tal.
-// -----------------------------------------------------------
+
 function parseVehicle($vehicle) {
     $count = count($vehicle);
 
