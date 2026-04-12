@@ -1,10 +1,21 @@
 <?php
-// response.php
+// response.php — Version B: Form/Response + Row Layout
+//
+// API datastruktur:
+//   $vehicles = [ [$tillverkarnamn, [$fordon1, $fordon2, ...]], ... ]
+//
+// Varje fordon är en array med varierande antal fält:
+//   - Index 0     : alltid modellnamnet
+//   - Sista index : alltid bildfilnamnet (slutar på .png)
+//   - "Hp"/"HP"   : HP-värdet (t.ex. "330Hp", "266Hp")
+//   - 4 siffror   : produktionsperiod (t.ex. "1997-2022")
+//   - Övriga      : drivlina, typ, etc.
+
 $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
 $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
 
-// Hämta tillverkarlista från manufacturer API
+// Hämta tillverkarlista från manufacturer-API
 $manufacturerJson = file_get_contents($MANUFACTURER_URL);
 $manufacturers    = json_decode($manufacturerJson, true);
 
@@ -25,7 +36,12 @@ if ($selectedCountry !== '') {
     }
 }
 
-// Listar ut vilket fält som är vilket (bild, HP, år).
+// -----------------------------------------------------------
+// Hjälpfunktion: identifierar fält smart oavsett antal index.
+// Bildfilnamnet är ALLTID sista indexet (slutar på .png).
+// HP matchar: enbart siffror följt av "Hp" eller "HP".
+// År matchar: innehåller ett fyrasiffrigt tal.
+// -----------------------------------------------------------
 function parseVehicle($vehicle) {
     $count = count($vehicle);
 
@@ -51,10 +67,13 @@ function parseVehicle($vehicle) {
         }
 
         if (preg_match('/^\d+\s*[Hh][Pp]$/', $val)) {
+            // HP-värde: t.ex. "330Hp", "265HP"
             $hp = $val;
         } elseif (preg_match('/\d{4}/', $val)) {
+            // Produktionsperiod: t.ex. "1997-2022", "1967-1982"
             $year = $val;
         } elseif ($val !== $model) {
+            // Övriga fält: drivlina, fordonstyp, etc.
             $extras[] = $val;
         }
     }
@@ -75,7 +94,7 @@ function parseVehicle($vehicle) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fordonsresultat</title>
     <style>
-        /* Grundlayout */
+        /* === Grundlayout === */
         body {
             font-family: Arial, sans-serif;
             background-color: #eef2f7;
@@ -115,7 +134,7 @@ function parseVehicle($vehicle) {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        /* Yttre tabell */
+        /* === Yttre tillverkartabell === */
         table.mfr-table {
             width: 100%;
             border-collapse: collapse;
@@ -136,7 +155,7 @@ function parseVehicle($vehicle) {
             vertical-align: top;
             font-size: 14px;
         }
-        /* Alternerande rader */
+        /* Alternerande rader — yttre tabell */
         table.mfr-table > tbody > tr:nth-child(even) {
             background-color: #f3f6fa;
         }
@@ -144,7 +163,7 @@ function parseVehicle($vehicle) {
             background-color: #ffffff;
         }
 
-        /* Nästlad fordonstabel */
+        /* === Nästlad fordonstabll — Row Layout (Version B) === */
         table.vehicle-table {
             width: 100%;
             border-collapse: collapse;
@@ -166,7 +185,7 @@ function parseVehicle($vehicle) {
         table.vehicle-table > tbody > tr:last-child > td {
             border-bottom: none;
         }
-        /* Alternerande rader i fordonstabellen */
+        /* Alternerande rader — fordonstabll (even/odd) */
         table.vehicle-table > tbody > tr:nth-child(even) {
             background-color: #eaf0f8;
         }
@@ -174,7 +193,7 @@ function parseVehicle($vehicle) {
             background-color: #f9fbfd;
         }
 
-        /* HP över 300 = röd text */
+        /* === Villkorsstyling: HP > 300 = röd text, annars svart === */
         .high-hp {
             color: red;
             font-weight: bold;
@@ -183,7 +202,7 @@ function parseVehicle($vehicle) {
             color: black;
         }
 
-        /* Fordonsbilder */
+        /* === Fordonsbilder === */
         img.vehicle-img {
             width: 100px;
             height: auto;
@@ -196,25 +215,33 @@ function parseVehicle($vehicle) {
 <div class="container">
 
     <h1>Fordonsresultat</h1>
-    <a class="back-link" href="from.php">&larr; Tillbaka</a>
+    <a class="back-link" href="form.php">&larr; Tillbaka</a>
 
     <?php if ($selectedCountry === ''): ?>
-        <!-- Inget val gjordes -->
+
+        <!-- Krav: inget val = inga fordon visas -->
         <div class="info-box">
             Inget val gjordes. Gå tillbaka och välj en tillverkare.
         </div>
+
     <?php elseif (empty($vehicles)): ?>
+
         <div class="info-box">
             Inga fordon hittades för
             <strong><?php echo htmlspecialchars($selectedCountry); ?></strong>.
         </div>
+
     <?php else: ?>
+
+        <!-- Yttre tillverkartabell -->
         <table class="mfr-table">
-            <thead><tr>
-                <th>Tillverkare</th>
-                <th>Land</th>
-                <th>Fordon</th>
-            </tr></thead>
+            <thead>
+                <tr>
+                    <th>Tillverkare</th>
+                    <th>Land</th>
+                    <th>Fordon</th>
+                </tr>
+            </thead>
             <tbody>
                 <?php foreach ($vehicles as $v): ?>
                     <?php
@@ -225,19 +252,26 @@ function parseVehicle($vehicle) {
                         <td><strong><?php echo htmlspecialchars($mfrName); ?></strong></td>
                         <td><?php echo htmlspecialchars($selectedCountry); ?></td>
                         <td>
-                            <!-- Nästlad tabell med fordon -->
+
+                            <!-- Nästlad fordonstabll: ett fordon per rad (Row Layout) -->
                             <table class="vehicle-table">
-                                <thead><tr>
-                                    <th>Bild</th>
-                                    <th>Modell</th>
-                                    <th>Info</th>
-                                    <th>Effekt (HP)</th>
-                                    <th>År</th>
-                                </tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Bild</th>
+                                        <th>Modell</th>
+                                        <th>Info</th>
+                                        <th>Effekt (HP)</th>
+                                        <th>År</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <?php foreach ($mfrVehicles as $vehicle): ?>
                                         <?php
+                                        // Parsea fordonet med smart fältidentifiering
                                         $f = parseVehicle($vehicle);
+
+                                        // Krav: HP > 300 = röd text
+                                        // intval(substr($hp, 0, -2)) tar bort "Hp"/"HP"
                                         $hpNumeric = intval(substr($f['hp'], 0, -2));
                                         if ($hpNumeric > 300) {
                                             $hpClass = 'high-hp';
@@ -248,9 +282,12 @@ function parseVehicle($vehicle) {
                                         <tr class="<?php echo $hpClass; ?>">
                                             <td>
                                                 <?php if ($f['imgFile'] !== ''): ?>
-                                                    <img class="vehicle-img"
-                                                         src="<?php echo htmlspecialchars($IMAGE_BASE . $f['imgFile']); ?>"
-                                                         alt="<?php echo htmlspecialchars($f['model']); ?>">
+                                                    <!-- img-tagg genererad från bildfilnamn i API -->
+                                                    <img
+                                                        class="vehicle-img"
+                                                        src="<?php echo htmlspecialchars($IMAGE_BASE . $f['imgFile']); ?>"
+                                                        alt="<?php echo htmlspecialchars($f['model']); ?>"
+                                                    >
                                                 <?php else: ?>
                                                     <em style="color:#aaa;">Ingen bild</em>
                                                 <?php endif; ?>
@@ -265,13 +302,17 @@ function parseVehicle($vehicle) {
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            <!-- Slut nästlad fordonstabll -->
+
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <!-- Slut yttre tillverkartabell -->
+
     <?php endif; ?>
 
 </div>
 </body>
-</html> 
+</html>
