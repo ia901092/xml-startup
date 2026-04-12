@@ -1,16 +1,5 @@
 <?php
-// response.php — Version B: Form/Response + Row Layout
-//
-// API datastruktur:
-//   $vehicles = [ [$tillverkarnamn, [$fordon1, $fordon2, ...]], ... ]
-//
-// Varje fordon är en array med varierande antal fält:
-//   - Index 0     : alltid modellnamnet
-//   - Sista index : alltid bildfilnamnet (slutar på .png)
-//   - "Hp"/"HP"   : HP-värdet (t.ex. "330Hp", "266Hp")
-//   - 4 siffror   : produktionsperiod (t.ex. "1997-2022")
-//   - Övriga      : drivlina, typ, etc.
-
+// response.php 
 $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
 $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
@@ -19,7 +8,7 @@ $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
 $manufacturerJson = file_get_contents($MANUFACTURER_URL);
 $manufacturers    = json_decode($manufacturerJson, true);
 
-// Läs valt land från GET
+//  valt land från GET
 $selectedCountry = isset($_GET['country']) ? trim($_GET['country']) : '';
 
 // Hämta fordon om ett land är valt
@@ -36,10 +25,7 @@ if ($selectedCountry !== '') {
     }
 }
 
-// Hjälpfunktion som försöker lista ut vilket fält som är vilket.
-// Bilden är alltid sista värdet (slutar på .png).
-// HP: bara siffror + "Hp" eller "HP".
-// År: innehåller ett 4-siffrigt tal.
+// Listar ut vilket fält som är vilket (bild, HP, år).
 
 function parseVehicle($vehicle) {
     $count = count($vehicle);
@@ -162,7 +148,7 @@ function parseVehicle($vehicle) {
             background-color: #ffffff;
         }
 
-        /* === Nästlad fordonstabll — Row Layout (Version B) === */
+        /* === Nästlad fordonstabll — Row Layout  
         table.vehicle-table {
             width: 100%;
             border-collapse: collapse;
@@ -208,4 +194,25 @@ function parseVehicle($vehicle) {
             display: block;
             border-radius: 4px;
         }
-   
+.high-hp {
+            color: red;
+            font-weight: bold;
+        }
+        .normal-hp {
+            color: black;
+        }
+
+        /* === Fordonsbilder === */
+        img.vehicle-img {
+            width: 100px;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Fordonsresultat</h1>
+    <a class="back-link" href="form.php">&larr; Tillbaka</a>
