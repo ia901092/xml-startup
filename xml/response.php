@@ -196,7 +196,7 @@ function parseVehicle($vehicle) {
 <div class="container">
 
     <h1>Fordonsresultat</h1>
-    <a class="back-link" href="form.php">&larr; Tillbaka</a>
+    <a class="back-link" href="from.php">&larr; Tillbaka</a>
 
     <?php if ($selectedCountry === ''): ?>
         <!-- Inget val gjordes -->
