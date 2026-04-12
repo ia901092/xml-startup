@@ -95,3 +95,51 @@ function parseVehicle($vehicle) {
     ];
 }
 ?>
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fordonsresultat</title>
+    <style>
+        /* Grundlayout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a3a5c;
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #1a3a5c;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1a3a5c;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+        .info-box {
+            background: #ffffff;
+            padding: 20px 24px;
+            border-radius: 8px;
+            color: #666666;
+            font-style: italic;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
