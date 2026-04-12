@@ -83,7 +83,6 @@ $arr      = json_decode($jsontext, true);
 </head>
 <body>
     <div class="card">
-        <a class="home-link" href="index.html">&larr; Till startsidan</a>
         <h1>Välj fordonstillverkare</h1>
         <form action="response.php" method="get">
             <label for="country">Tillverkare:</label>

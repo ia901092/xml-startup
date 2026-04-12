@@ -4,7 +4,7 @@ $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufa
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
 $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
 
-// Hämta tillverkarlista från manufacturer-API
+// Hämta tillverkaare från manufacturer-API
 $manufacturerJson = file_get_contents($MANUFACTURER_URL);
 $manufacturers    = json_decode($manufacturerJson, true);
 
@@ -108,14 +108,6 @@ function parseVehicle($vehicle) {
         a.back-link:hover {
             text-decoration: underline;
         }
-        a.home-link {
-            display: inline-block;
-            margin-left: 20px;
-            color: #1a3a5c;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 14px;
-        }
         a.home-link:hover {
             text-decoration: underline;
         }
@@ -211,7 +203,6 @@ function parseVehicle($vehicle) {
 
     <h1>Fordonsresultat</h1>
     <a class="back-link" href="form.php">&larr; Tillbaka till val</a>
-    <a class="home-link" href="index.html">Startsida</a>
 
     <?php if ($selectedCountry === ''): ?>
 
