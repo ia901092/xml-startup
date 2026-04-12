@@ -1,48 +1,28 @@
 <?php
-// Hämtar fordon från API och visar dem i en tabell
+// response.php — Version B: Form/Response + Row Layout
+//
+// API datastruktur:
+//   $vehicles = [ [$tillverkarnamn, [$fordon1, $fordon2, ...]], ... ]
+//
+// Varje fordon är en array med varierande antal fält:
+//   - Index 0     : alltid modellnamnet
+//   - Sista index : alltid bildfilnamnet (slutar på .png)
+//   - "Hp"/"HP"   : HP-värdet (t.ex. "330Hp", "266Hp")
+//   - 4 siffror   : produktionsperiod (t.ex. "1997-2022")
+//   - Övriga      : drivlina, typ, etc.
 
 $MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
 $IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
-?><?php
-// Hämtar fordon från API och visar dem i en tabell
 
-$MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
-$VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
-$IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
-
-// Hämtar tillverkarnamnen från API
+// Hämta tillverkarlista från manufacturer API
 $manufacturerJson = file_get_contents($MANUFACTURER_URL);
 $manufacturers    = json_decode($manufacturerJson, true);
 
-// Kollar vilket land användaren valde i formuläret
+// Läs valt land från GET
 $selectedCountry = isset($_GET['country']) ? trim($_GET['country']) : '';
 
-// Hämtar fordon om användaren valt ett land
-$vehicles = [];
-if ($selectedCountry !== '') {
-    $vehicleJson = file_get_contents(
-        $VEHICLES_URL . "?country=" . urlencode($selectedCountry)
-    );
-    if ($vehicleJson !== false) {
-        $decoded = json_decode($vehicleJson, true);
-        if (is_array($decoded)) {
-            $vehicles = $decoded;
-        }
-    }
-}
-?><?php
-// Hämtar fordon från API och visar dem i en tabell
-
-$MANUFACTURER_URL = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
-$VEHICLES_URL     = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/";
-$IMAGE_BASE       = "https://wwwlab.webug.se/examples/XML/vehicleImages/";
-
-$manufacturerJson = file_get_contents($MANUFACTURER_URL);
-$manufacturers    = json_decode($manufacturerJson, true);
-
-$selectedCountry = isset($_GET['country']) ? trim($_GET['country']) : '';
-
+// Hämta fordon om ett land är valt
 $vehicles = [];
 if ($selectedCountry !== '') {
     $vehicleJson = file_get_contents(
@@ -56,12 +36,18 @@ if ($selectedCountry !== '') {
     }
 }
 
-// Funktion som tar ut modell, hp, år och bild från varje fordon
+// Hjälpfunktion som försöker lista ut vilket fält som är vilket.
+// Bilden är alltid sista värdet (slutar på .png).
+// HP: bara siffror + "Hp" eller "HP".
+// År: innehåller ett 4-siffrigt tal.
+
 function parseVehicle($vehicle) {
     $count = count($vehicle);
+
+    // Index 0 = alltid modellnamn
     $model = ($count > 0) ? trim($vehicle[0]) : '-';
 
-    // Sista värdet är alltid bildfilnamnet
+    // Sista index = alltid bildfilnamn
     $lastIndex = $count - 1;
     $imgFile   = ($count > 1 && stripos($vehicle[$lastIndex], '.png') !== false)
         ? trim($vehicle[$lastIndex])
@@ -71,17 +57,22 @@ function parseVehicle($vehicle) {
     $year   = '-';
     $extras = [];
 
+    // Loopa mellanliggande fält (index 1 t.o.m. näst-sista)
     $endIndex = ($imgFile !== '') ? $lastIndex - 1 : $lastIndex;
     for ($i = 1; $i <= $endIndex; $i++) {
         $val = trim($vehicle[$i]);
-        if ($val === '') continue;
+        if ($val === '') {
+            continue;
+        }
 
-        // Kolla om det är hp, år eller annan info
         if (preg_match('/^\d+\s*[Hh][Pp]$/', $val)) {
+            // HP-värde: t.ex. "330Hp", "265HP"
             $hp = $val;
         } elseif (preg_match('/\d{4}/', $val)) {
+            // Produktionsperiod: t.ex. "1997-2022", "1967-1982"
             $year = $val;
         } elseif ($val !== $model) {
+            // Övriga fält: drivlina, fordonstyp, etc.
             $extras[] = $val;
         }
     }
@@ -102,7 +93,7 @@ function parseVehicle($vehicle) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fordonsresultat</title>
     <style>
-        /* Grundlayout */
+        /* === Grundlayout === */
         body {
             font-family: Arial, sans-serif;
             background-color: #eef2f7;
@@ -141,9 +132,8 @@ function parseVehicle($vehicle) {
             font-size: 14px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
-    </style>
-</head>
-/* Yttre tabell */
+
+        /* === Yttre tabell === */
         table.mfr-table {
             width: 100%;
             border-collapse: collapse;
@@ -164,10 +154,15 @@ function parseVehicle($vehicle) {
             vertical-align: top;
             font-size: 14px;
         }
-        table.mfr-table > tbody > tr:nth-child(even) { background-color: #f3f6fa; }
-        table.mfr-table > tbody > tr:nth-child(odd)  { background-color: #ffffff; }
+        /* Alternerande rader — yttre tabell */
+        table.mfr-table > tbody > tr:nth-child(even) {
+            background-color: #f3f6fa;
+        }
+        table.mfr-table > tbody > tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
 
-        /* Nästlad tabell */
+        /* === Nästlad fordonstabll — Row Layout (Version B) === */
         table.vehicle-table {
             width: 100%;
             border-collapse: collapse;
@@ -186,16 +181,31 @@ function parseVehicle($vehicle) {
             border-bottom: 1px solid #dde3ea;
             vertical-align: middle;
         }
-        table.vehicle-table > tbody > tr:last-child > td { border-bottom: none; }
-        table.vehicle-table > tbody > tr:nth-child(even) { background-color: #eaf0f8; }
-        table.vehicle-table > tbody > tr:nth-child(odd)  { background-color: #f9fbfd; }
+        table.vehicle-table > tbody > tr:last-child > td {
+            border-bottom: none;
+        }
+        /* Alterntivrvt rader — fordonstabll (udda/jämt) */
+        table.vehicle-table > tbody > tr:nth-child(even) {
+            background-color: #eaf0f8;
+        }
+        table.vehicle-table > tbody > tr:nth-child(odd) {
+            background-color: #f9fbfd;
+        }
 
-        /* HP-färg och bilder */
-        .high-hp { color: red; font-weight: bold; }
-        .normal-hp { color: black; }
+        /* === Villkorsstyling: HP > 300 = röd text, annars svart === */
+        .high-hp {
+            color: red;
+            font-weight: bold;
+        }
+        .normal-hp {
+            color: black;
+        }
+
+        /* === Fordonsbilder === */
         img.vehicle-img {
             width: 100px;
             height: auto;
             display: block;
             border-radius: 4px;
         }
+   
