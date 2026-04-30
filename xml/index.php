@@ -29,6 +29,10 @@ if (isset($_GET['country']) && $_GET['country'] != "") {
         h1 {
             color: #333;
         }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+        }
         label {
             font-weight: bold;
             display: block;
@@ -48,6 +52,25 @@ if (isset($_GET['country']) && $_GET['country'] != "") {
         }
         input[type="submit"]:hover {
             background-color: #555;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -74,7 +97,7 @@ if (isset($_GET['country']) && $_GET['country'] != "") {
 <?php
 if ($selected_country != "" && count($vehicles) > 0) {
     echo "        <h2>Fordon för " . htmlspecialchars($selected_country) . "</h2>\n";
-    echo "        <table border=\"1\">\n";
+    echo "        <table>\n";
     echo "            <tr>\n";
     echo "                <th>Tillverkare</th>\n";
     echo "                <th>Fordon</th>\n";
@@ -100,7 +123,13 @@ if ($selected_country != "" && count($vehicles) > 0) {
             echo "        <tr>\n";
             echo "            <td>" . htmlspecialchars($manufacturer) . "</td>\n";
             echo "            <td>\n";
-            echo "                <table border=\"1\">\n";
+            echo "                <table>\n";
+            echo "                    <tr>\n";
+            echo "                        <th>Modell</th>\n";
+            echo "                        <th>Effekt</th>\n";
+            echo "                        <th>År</th>\n";
+            echo "                        <th>Bild</th>\n";
+            echo "                    </tr>\n";
         }
         
         echo "                    <tr>\n";
