@@ -72,6 +72,12 @@ if (isset($_GET['country']) && $_GET['country'] != "") {
         tr:hover {
             background-color: #f0f0f0;
         }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
