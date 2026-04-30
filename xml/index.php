@@ -2,6 +2,16 @@
 $url      = "https://wwwlab.webug.se/examples/XML/vehiclesservice/manufacturer";
 $jsontext = file_get_contents($url);
 $arr      = json_decode($jsontext, true);
+
+$vehicles = array();
+$selected_country = "";
+
+if (isset($_GET['country']) && $_GET['country'] != "") {
+    $selected_country = $_GET['country'];
+    $vehicle_url = "https://wwwlab.webug.se/examples/XML/vehiclesservice/vehicles/?country=" . urlencode($selected_country);
+    $vehicle_json = file_get_contents($vehicle_url);
+    $vehicles = json_decode($vehicle_json, true);
+}
 ?>
 <!DOCTYPE html>
 <html lang="sv">
@@ -53,12 +63,20 @@ $arr      = json_decode($jsontext, true);
         foreach ($arr as $manufacturer) {
             $name    = $manufacturer[0];
             $country = $manufacturer[1];
-            echo "        <option value=\"" . htmlspecialchars($country) . "\">" . htmlspecialchars($name) . "</option>\n";
+            $selected = ($selected_country == $country) ? "selected" : "";
+            echo "        <option value=\"" . htmlspecialchars($country) . "\" " . $selected . ">" . htmlspecialchars($name) . "</option>\n";
         }
         ?>
     </select>
     <input type="submit" value="Visa fordon">
 </form>
+
+<?php
+if ($selected_country != "" && count($vehicles) > 0) {
+    echo "        <h2>Fordon för " . htmlspecialchars($selected_country) . "</h2>\n";
+    echo "        <p>Fordon hämtade.</p>\n";
+}
+?>
 
 </body>
 </html>
