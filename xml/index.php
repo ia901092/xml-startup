@@ -105,7 +105,12 @@ if ($selected_country != "" && count($vehicles) > 0) {
         
         echo "                    <tr>\n";
         echo "                        <td>" . htmlspecialchars($model) . "</td>\n";
-        echo "                        <td>" . htmlspecialchars($hp) . "</td>\n";
+        
+        // Get HP value and apply conditional styling
+        $hp_numeric = intval(substr($hp, 0, -3));
+        $hp_color = ($hp_numeric > 300) ? "red" : "black";
+        echo "                        <td style=\"color: " . $hp_color . ";\">" . htmlspecialchars($hp) . "</td>\n";
+        
         echo "                        <td>" . htmlspecialchars($year) . "</td>\n";
         echo "                        <td>" . htmlspecialchars($image) . "</td>\n";
         echo "                    </tr>\n";
