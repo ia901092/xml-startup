@@ -74,7 +74,50 @@ if (isset($_GET['country']) && $_GET['country'] != "") {
 <?php
 if ($selected_country != "" && count($vehicles) > 0) {
     echo "        <h2>Fordon för " . htmlspecialchars($selected_country) . "</h2>\n";
-    echo "        <p>Fordon hämtade.</p>\n";
+    echo "        <table border=\"1\">\n";
+    echo "            <tr>\n";
+    echo "                <th>Tillverkare</th>\n";
+    echo "                <th>Fordon</th>\n";
+    echo "            </tr>\n";
+    
+    $current_manufacturer = "";
+    
+    foreach ($vehicles as $vehicle) {
+        $manufacturer = $vehicle[0];
+        $model        = $vehicle[1];
+        $hp           = $vehicle[2];
+        $year         = $vehicle[3];
+        $image        = $vehicle[4];
+        
+        if ($manufacturer != $current_manufacturer) {
+            if ($current_manufacturer != "") {
+                echo "                </table>\n";
+                echo "            </td>\n";
+                echo "        </tr>\n";
+            }
+            
+            $current_manufacturer = $manufacturer;
+            echo "        <tr>\n";
+            echo "            <td>" . htmlspecialchars($manufacturer) . "</td>\n";
+            echo "            <td>\n";
+            echo "                <table border=\"1\">\n";
+        }
+        
+        echo "                    <tr>\n";
+        echo "                        <td>" . htmlspecialchars($model) . "</td>\n";
+        echo "                        <td>" . htmlspecialchars($hp) . "</td>\n";
+        echo "                        <td>" . htmlspecialchars($year) . "</td>\n";
+        echo "                        <td>" . htmlspecialchars($image) . "</td>\n";
+        echo "                    </tr>\n";
+    }
+    
+    if ($current_manufacturer != "") {
+        echo "                </table>\n";
+        echo "            </td>\n";
+        echo "        </tr>\n";
+    }
+    
+    echo "        </table>\n";
 }
 ?>
 
