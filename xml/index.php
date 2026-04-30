@@ -112,7 +112,11 @@ if ($selected_country != "" && count($vehicles) > 0) {
         echo "                        <td style=\"color: " . $hp_color . ";\">" . htmlspecialchars($hp) . "</td>\n";
         
         echo "                        <td>" . htmlspecialchars($year) . "</td>\n";
-        echo "                        <td>" . htmlspecialchars($image) . "</td>\n";
+        
+        // Generate image tag
+        $img_url = "https://wwwlab.webug.se/examples/XML/vehicleImages/" . $image;
+        echo "                        <td><img src=\"" . htmlspecialchars($img_url) . "\" alt=\"" . htmlspecialchars($model) . "\" style=\"height: 50px;\"></td>\n";
+        
         echo "                    </tr>\n";
     }
     
